@@ -186,6 +186,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # Custom
-*/__pycache__/
+__pycache__/*
+*/__pycache__/*
 
 # End of https://www.gitignore.io/api/osx,linux,windows,pycharm,jetbrains,virtualenv

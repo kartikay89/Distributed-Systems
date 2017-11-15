@@ -2,11 +2,6 @@ from units.Unit import Unit
 
 
 class Dragon(Unit):
-    def dealDamage(self, x, y, damage):
-        pass
-
-    def adjustHitPoints(self, modifier):
-        pass
 
     def hi(self):
         print("health is %s\n" % self.maxHealth)
@@ -20,32 +15,6 @@ class Dragon(Unit):
     MIN_ATTACKPOINTS = 5
     MAX_ATTACKPOINTS = 10
 
-    def __init__(self, maxHealth=100, attackPoints=50):
+    def __init__(self, maxHealth=250, attackPoints=50):
+        print("dragon: maxHealth: %d %d\n" % (20, maxHealth))
         super().__init__(maxHealth, attackPoints)
-        # self.maxHealth = maxHealth
-        # self.attackPoints = attackPoints
-
-    # def __init__(self, maxHealth, attackPoints):
-        # TODO maybe these need to be handled with abc.properties
-        # self.hitPoints = self.maxHitPoints = maxHealth
-        # self.attackPoints = attackPoints
-
-        # Socket localSocket = new LocalSocket();
-        # messageList = newHashMap < Integer, Message > ();
-        #
-        # // Get a new unit id
-        # unitID = BattleField.getBattleField().getNewUnitID();
-        #
-        # // Create a new socket
-        # clientSocket = new SynchronizedSocket(localSocket);
-        #
-        # try {
-        # // Try to register the socket
-        # clientSocket.register("D" + unitID);
-        # }
-        # catch(AlreadyAssignedIDException
-        # e) {
-        #     System.err.println("Socket \"D" + unitID + "\" was already registered.");
-        # }
-        #
-        # clientSocket.addMessageReceivedHandler(this)
