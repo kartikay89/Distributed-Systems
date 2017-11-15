@@ -185,4 +185,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Custom
+*/__pycache__/
+
 # End of https://www.gitignore.io/api/osx,linux,windows,pycharm,jetbrains,virtualenv
