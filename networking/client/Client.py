@@ -5,6 +5,9 @@ import time
 from networking import safe_print, PORT, MAX_MSG_SIZE
 
 
+# In its current form, the client will try to connect to a socket on 127.0.0.<id>
+# The idea is that there will be a server waiting for this client. As I'm writing this,
+# this is NOT THE CASE; the servers currently do nothing anymore besides pinging each other.
 class Client(threading.Thread):
     def __init__(self, identifier):
         threading.Thread.__init__(self)

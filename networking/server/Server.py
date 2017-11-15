@@ -9,19 +9,23 @@ class Server(threading.Thread):
         threading.Thread.__init__(self)
         self.identifier = identifier
 
-        # Every server has its own ServerListener thread, which listens for other connecting servers
         self.neighbours = []
+        self.timestamps = {}
         self.stop = False
         self.server_lock = threading.RLock()
+        # This thread will listen for pinging servers, reply if necessary and update the neighbours-list
         self.server_listener = ServerListener(self)
         self.server_listener.start()
+        # This thread will broadcast ping messages, listen for replies and update the neighbours-list
         self.server_broadcaster = ServerBroadcaster(self, 1) # Ping every second
         self.server_broadcaster.start()
 
     def s_print(self, s):
         safe_print('[SERVER {:d}]: {:s}'.format(self.identifier, s))
 
-    '''def test(self):
+    # This function assumes that there will be 1 Client connecting to 127.0.0.<id>
+    # As I'm writing this, THIS IS CURRENTLY NOT THE CASE (anymore).
+    def interact_client(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Allows sockets to bind to addresses that are already in use (useful if we kill the program, or if we used this address shortly before)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -44,7 +48,7 @@ class Server(threading.Thread):
         client_socket.send('<< Greetings from SERVER {:d} >>'.format(self.identifier))
         
         client_socket.close()
-        self.s_print('Stopped.')'''
+        self.s_print('Stopped.')
 
     def run(self):
         start_time = time.time()
