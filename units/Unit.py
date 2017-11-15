@@ -82,6 +82,40 @@ class Unit(abc.ABC):
         self.getUnit(x, y)
         return True
 
+    #
+    # 	 * Returns whether the indicated square contains a player, a dragon or nothing.
+    # 	 * @param x: x coordinate
+    # 	 * @param y: y coordinate
+    # 	 * @return UnitType: the indicated square contains a player, a dragon or nothing.
+    #
+    def getType(self, x, y):
+        getMessage = Message()
+        result = None
+        id = self.localMessageCounter
+        self.localMessageCounter += 1
+        getMessage.put("request", MessageRequest.getType)
+        getMessage.put("x", x)
+        getMessage.put("y", y)
+        getMessage.put("id", id)
+        #  Send the getUnit message
+        self.sendMessage(getMessage)
+        #  Wait for the reply
+        while key not  in self.messageList:
+            try:
+                time.sleep(1)
+            except ValueError as e:
+                pass
+            # Quit if the game window has closed
+            # TODO reenable after GameState is setup
+            # if not GameState.getRunningState():
+            #     return self.UnitType.undefined
+        result = self.messageList[id]
+        if result == None:
+            #  Could happen if the game window had closed
+            return self.UnitType.undefined
+        self.messageList[id] =  None
+        return result["type"]
+
     def getUnit(self, x, y):
         getMessage = Message()
         result = None
@@ -106,11 +140,35 @@ class Unit(abc.ABC):
                 pass
             # Quit if the game window has closed
             # TODO re-enable once we have GameState
-            # if not GameState.getRunningState():
+            # if not GameState.getRunning   State():
             #     return None
         result = self.messageList.get(id)
         self.messageList.put(id, None)
-        return result.get("unit")
+        return result["unit"]
+
+    def moveUnit(self, x, y):
+        moveMessage = Message()
+        id = self.localMessageCounter
+        self.localMessageCounter += 1
+        moveMessage.put("request", MessageRequest.moveUnit)
+        moveMessage.put("x", x)
+        moveMessage.put("y", y)
+        moveMessage.put("id", id)
+        moveMessage.put("unit", self)
+        #  Send the getUnit message
+        self.sendMessage(moveMessage)
+        #  Wait for the reply
+        while key not  in self.messageList:
+            try:
+                time.sleep(1)
+            except ValueError as e:
+                pass
+            # Quit if the game window has closed
+            # TODO reenable after Gamestate is implemented
+            # if not GameState.getRunningState():
+            #     return
+        # Remove the result from the messageList
+        self.messageList[id] = None
 
     def adjustHitPoints(self, modifier):
         if self.hitPoints <= 0:

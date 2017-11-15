@@ -1,5 +1,5 @@
 class MessageRequest:
-    spawnUnit, getUnit, dealDamage, removeUnit = range(4)
+    spawnUnit, getUnit, moveUnit, getType, dealDamage, removeUnit = range(6)
 
 
 class Message:
