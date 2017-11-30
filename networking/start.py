@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 import argparse
 
-from networking import Server, Client
+from networking import Server, GameServer, HeadServer, Client
 
 
 # Use argparse to parse args (useful when we start having many of them)
@@ -27,12 +27,16 @@ if __name__ == '__main__':
 
     servers = []
     clients = []
+    head_server = None
 
     for i in range(nservers):
-        servers.append(Server(i))
-        # start() calls internal run() function
-        servers[-1].start()
+        if i == 0:
+            head_server = HeadServer(i)
+            head_server.start()
+        else:
+            servers.append(GameServer(i))
+            servers[-1].start()
 
-    '''for i in range(nservers):
+    for i in range(1):
         clients.append(Client(i))
-        clients[-1].start()'''
+        clients[-1].start()

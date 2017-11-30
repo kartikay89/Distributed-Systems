@@ -1,9 +1,11 @@
 import socket
 import threading
 import time
-from networking import LOCAL, PORT, MAX_MSG_SIZE, safe_print
+from networking import LOCAL, PORT, MAX_MSG_SIZE, DEBUG_PRINT, safe_print
 
 
+# This class is used to ping all neighbouring servers, listen for replies and update the server's 
+# peer list accordingly.
 class ServerBroadcaster(threading.Thread):
     def __init__(self, server, interval):
         threading.Thread.__init__(self)
@@ -14,14 +16,17 @@ class ServerBroadcaster(threading.Thread):
         self.neighbours = []
 
     def sb_print(self, s):
-        safe_print('[SERVERBROADCASTER {:d}]: {:s}'.format(self.server.identifier, s))
+        if DEBUG_PRINT:
+            safe_print('[SERVERBROADCASTER {:d}]: {:s}'.format(self.server.identifier, s))
 
-    # Given a list of tuples (host, port), this function adds an entry to it if it is not already in it
-    def add_neighbour(self, src_tuple):
-        if src_tuple not in self.neighbours:
-            self.neighbours.append(src_tuple)
+    # This functions adds a host to our peer list if it is not already in there,
+    # and if it is not equal to our server's hostname
+    def add_neighbour(self, host):
+        if host not in self.neighbours and host != self.server.host:
+            self.neighbours.append(host)
         else:
-            self.sb_print('Got reply from {:s}, which was already in our list'.format(str(src_tuple)))
+            #self.sb_print('Got reply from {:s}, which was already in our list'.format(host))
+            pass
 
     # Given a (correctly defined) socket, checks if there are any replies to process.
     def check_replies(self, s):
@@ -51,17 +56,15 @@ class ServerBroadcaster(threading.Thread):
                 timestamp = time.time()
                 # Update the server's neighbour list with the data gathered from our previous ping
                 # By replacing the list entirely, we also deal with the issue of removing outdated entries
-                with self.server.server_lock:
+                with self.server.peer_lock:
                     self.server.neighbours = self.neighbours
-                    self.sb_print('Updated neighbours to {:s}'.format(self.neighbours))
                 # Start with an empty neighbours list again
                 self.neighbours = []
                 s.sendto('Ping from ServerBroadcaster {:d}'.format(self.server.identifier), ('<broadcast>', PORT))
-                self.sb_print('Pinged.')
             else:
                 self.check_replies(s)
                 # If our Server thread has told us to stop, we stop; otherwise, we yield to another thread
-                with self.server.server_lock:
+                with self.server.peer_lock:
                     if self.server.stop:
                         # Close socket and stop
                         s.close()
