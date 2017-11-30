@@ -18,11 +18,9 @@ class HeadServerListener(threading.Thread):
         while True:
             try:
                 sock, host = s.accept()
-                # MessageReceiver will put the message in msgdict['msg']
-                msgdict = {}
-                MessageReceiver(self.server, sock, host, TIMEOUT, msgdict).start()
-                self.hsl_print('Found client at {:s}, msgdict {:s}'.format(str(host), str(msgdict)))
+                MessageReceiver(self.server, sock, host, TIMEOUT).start()
             except Exception, e:
+                # Do not print error messages telling us that 'the resource is not available' (those are fine)
                 if 'Errno 11' not in str(e):
                     self.hsl_print(e)
                 break
@@ -31,10 +29,9 @@ class HeadServerListener(threading.Thread):
         # Set up socket to receive messages from peers
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.hsl_print('going to listen on ' + HEADSERVER_IP + ':' + str(CLIENT_PORT))
         s.bind((HEADSERVER_IP, CLIENT_PORT))
         s.setblocking(0)
-        self.hsl_print('listening on ' + HEADSERVER_IP + ':' + str(CLIENT_PORT))
-
         s.listen(SOCKET_BACKLOG_SIZE)
         
         while True:

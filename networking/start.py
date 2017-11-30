@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 
 # Append current working directory to the paths in which Python looks for modules
 sys.path.insert(0, os.path.abspath('..'))

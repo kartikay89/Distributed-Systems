@@ -1,7 +1,7 @@
 import socket
 import threading
 import time
-from networking import LOCAL, PORT, MAX_MSG_SIZE, DEBUG_PRINT, SOCKET_BACKLOG_SIZE, TIMEOUT, safe_print, MessageReceiver
+from networking import LOCAL, PORT, MAX_MSG_SIZE, DEBUG_PRINT, SOCKET_BACKLOG_SIZE, TIMEOUT, safe_print, MessageReceiver, Message
 
 
 class ServerListener(threading.Thread):
@@ -18,7 +18,6 @@ class ServerListener(threading.Thread):
         while True:
             try:
                 sock, host = s.accept()
-                self.sl_print('Starting MessageReceiver')
                 MessageReceiver(self.server, sock, host, TIMEOUT).start()
             except:
                 break

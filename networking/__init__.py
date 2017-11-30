@@ -11,12 +11,16 @@ TIMEOUT             = 1.0   # In seconds
 HEADSERVER_IP       = '127.0.0.250'
 #DEBUG_PRINT        = False
 DEBUG_PRINT         = True
+CONFIRM             = 'Thanks'
 
 # When multiple threads are printing at the same time, the newlines are not printed at the same moment as the string
 # This function takes care of this. Alternatively, just call sys.stdout.write(<...>)
 def safe_print(s):
     sys.stdout.write(s + '\n')
+    sys.stdout.flush()
 
+from server.non_blocking_functions import await_confirm, await_reply, connect_to_dst
+from Message import Message
 from server.MessageReceiver import MessageReceiver
 from server.MessageSender import MessageSender
 from server.ServerListener import ServerListener
