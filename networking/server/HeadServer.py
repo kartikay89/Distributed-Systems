@@ -12,10 +12,6 @@ class HeadServer(Server):
     def __init__(self, identifier):
         Server.__init__(self, identifier)
 
-        # A lock-protected list of clients that have connected to the head server
-        self.clients_lock = threading.RLock()
-        self.clients = []
-
         self.head_server_listener = HeadServerListener(self)
         self.head_server_listener.start()
 
@@ -26,6 +22,7 @@ class HeadServer(Server):
     def redirect_client(self, message):
         with self.peer_lock:
             if len(self.neighbours) == 0:
+                self.s_print('No neighbours')
                 return False
             # TODO: improve
             host = random.choice(self.neighbours)
@@ -50,17 +47,19 @@ class HeadServer(Server):
                         continue
                 # If we reach this point, the message hasn't been dealt with so we keep it
                 remaining_messages.append(message)
+                self.s_print('Couldn\'t deal with {:d} msgs'.format(len(remaining_messages)))
             self.messages = remaining_messages
 
     def run(self):
         start_time = time.time()
+        iter_time = start_time
         current_time = start_time
         
         # Stop after 5 seconds
         while True:
             current_time = time.time()
+            self.handle_messages()
             if current_time - start_time >= 5:
-                self.handle_messages()
                 with self.clients_lock:
                     self.s_print('Clients connected: {:s}'.format(str(self.clients)))
                     self.clients = []
@@ -72,5 +71,7 @@ class HeadServer(Server):
                 self.server_broadcaster.join()
                 self.s_print('Stopped.')
                 break
-            else:
-                time.sleep(0)
+            elif current_time - iter_time >= 1:
+                iter_time = current_time
+                #self.send_to_all('Greetings from {:s}'.format(self.host))
+            time.sleep(0)

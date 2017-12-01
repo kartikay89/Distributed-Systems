@@ -11,8 +11,8 @@ class ServerBroadcaster(threading.Thread):
         threading.Thread.__init__(self)
         self.server = server
         self.interval = interval
-        # This list will be updated on ping replies, and will replace
-        # the server's neighbours list every <interval> seconds
+        # List of peers that have replied during the last <interval> seconds
+        # Used to get rid of outdated peers
         self.neighbours = []
 
     def sb_print(self, s):
@@ -21,12 +21,13 @@ class ServerBroadcaster(threading.Thread):
 
     # This functions adds a host to our peer list if it is not already in there,
     # and if it is not equal to our server's hostname
+    # It also updates the server's peer list
     def add_neighbour(self, host):
         if host not in self.neighbours and host != self.server.host:
             self.neighbours.append(host)
-        else:
-            #self.sb_print('Got reply from {:s}, which was already in our list'.format(host))
-            pass
+        with self.server.peer_lock:
+            if host not in self.server.neighbours:
+                self.server.neighbours.append(host)
 
     # Given a (correctly defined) socket, checks if there are any replies to process.
     def check_replies(self, s):
@@ -55,7 +56,7 @@ class ServerBroadcaster(threading.Thread):
                 ping = False
                 timestamp = time.time()
                 # Update the server's neighbour list with the data gathered from our previous ping
-                # By replacing the list entirely, we also deal with the issue of removing outdated entries
+                # By replacing the list entirely, we deal with the issue of removing outdated entries
                 with self.server.peer_lock:
                     self.server.neighbours = self.neighbours
                 # Start with an empty neighbours list again
@@ -64,16 +65,15 @@ class ServerBroadcaster(threading.Thread):
             else:
                 self.check_replies(s)
                 # If our Server thread has told us to stop, we stop; otherwise, we yield to another thread
-                with self.server.peer_lock:
+                with self.server.stop_lock:
                     if self.server.stop:
                         # Close socket and stop
                         s.close()
                         self.sb_print('Stopped.')
-                        break
-                    else:
-                        # Yield
-                        time.sleep(0)
-                        # Check if we need to send another ping
-                        if time.time() - timestamp > self.interval:
-                            ping = True
+                        return
+                # Yield
+                time.sleep(0)
+                # Check if we need to send another ping
+                if time.time() - timestamp > self.interval:
+                    ping = True
      

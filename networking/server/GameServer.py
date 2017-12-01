@@ -21,6 +21,11 @@ class GameServer(Server):
                 message._reply_socket.close()
             self.messages = []
 
+    def update_clients(self):
+        with self.clients_lock:
+            for client in self.clients:
+                self.send_message(client, Message(type='DRAW', contents='TEST!'))
+
     def run(self):
         start_time = time.time()
         print_time = start_time
@@ -30,6 +35,7 @@ class GameServer(Server):
         while True:
             current_time = time.time()
             self.handle_messages()
+            self.update_clients()
             if current_time - start_time >= 5:
                 with self.stop_lock:
                     self.stop = True
@@ -41,5 +47,5 @@ class GameServer(Server):
             elif current_time - print_time >= 1:
                 print_time = current_time
                 self.s_print(str(self.neighbours))
-            else:
-                time.sleep(0)
+            # Yield
+            time.sleep(0)

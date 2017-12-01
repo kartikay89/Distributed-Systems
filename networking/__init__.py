@@ -19,10 +19,10 @@ def safe_print(s):
     sys.stdout.write(s + '\n')
     sys.stdout.flush()
 
-from server.non_blocking_functions import await_confirm, await_reply, connect_to_dst
+from non_blocking_functions import await_confirm, await_reply, connect_to_dst
 from Message import Message
-from server.MessageReceiver import MessageReceiver
-from server.MessageSender import MessageSender
+from MessageReceiver import MessageReceiver
+from MessageSender import MessageSender
 from server.ServerListener import ServerListener
 from server.HeadServerListener import HeadServerListener
 from server.ServerBroadcaster import ServerBroadcaster

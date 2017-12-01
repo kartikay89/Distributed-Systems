@@ -4,6 +4,8 @@ class MessageRequest(object):
 
 class Message(object):
     def __init__(self, *args, **kwargs):
+        # Clients sending messages should set this to be True
+        self.client = False
         # Make the Message look like a string if we supply a string as its first and only non-keyword arg
         if len(args) == 1:
             self.__dict__['__stringdata'] = args[0];

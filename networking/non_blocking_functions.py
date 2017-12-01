@@ -11,23 +11,23 @@ def await_reply(obj, s, host, printf):
     while True:
         try:
             pickled_reply = s.recv(MAX_MSG_SIZE)
-            reply = str(pickle.loads(pickled_reply))
+            reply = pickle.loads(pickled_reply)
             return reply
         except socket.error as serr:
             # This is a non-blocking socket, so errno 11 (Resource unavailable) just means we should yield
             if serr.errno != 11:
-                printf('Error receiving reply from {:s}: {:s}'.format(host, serr))
+                printf('Socket error receiving reply from {:s}: {:s}'.format(host, serr))
                 return None
             time.sleep(0)
-        except Exception, e:
-            printf(obj, 'Error receiving reply from {:s}: {:s}'.format(host, e))
-            return None
+        #except Exception, e:
+        #    printf(obj, 'Error receiving reply from {:s}: {:s}'.format(host, e))
+        #    return None
 
 
 # Waits for a server to confirm our previously sent message
 # Should be called with non-blocking socket
 def await_confirm(obj, s, host, printf):
-    reply = await_reply(obj, s, host, printf)
+    reply = str(await_reply(obj, s, host, printf))
     if reply == '':
         printf(obj, 'Error receiving confirmation from {:s}: Did not receive confirmation'.format(host))
         return False

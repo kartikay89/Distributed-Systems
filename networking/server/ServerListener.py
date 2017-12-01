@@ -25,8 +25,6 @@ class ServerListener(threading.Thread):
                 break
 
     def run(self):
-        start_time = time.time()
-
         # Set up socket to listen for Ping broadcasts
         ping_s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         ping_s.setblocking(0)
@@ -39,7 +37,7 @@ class ServerListener(threading.Thread):
         try:
             server_s.bind((self.server.host, PORT))
         except:
-            self.sl_print('Failed to bind, self.server.host = {:s}'.format(self.server.host))
+            self.sl_print('failed to bind, self.server.host = {:s}'.format(self.server.host))
             return
         server_s.setblocking(0)
         self.sl_print('listening on ' + self.server.host + ':' + str(PORT))
@@ -67,6 +65,5 @@ class ServerListener(threading.Thread):
                     ping_s.close()
                     server_s.close()
                     self.sl_print('Stopped.')
-                    break
-                else:
-                    time.sleep(0)
+                    return
+            time.sleep(0)
