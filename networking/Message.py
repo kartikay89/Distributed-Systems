@@ -4,6 +4,9 @@ class MessageRequest(object):
 
 class Message(object):
     def __init__(self, *args, **kwargs):
+        # Standard type that all messages should have, with their standard values
+        self.client = False
+        self.type = None
         # Make the Message look like a string if we supply a string as its first and only non-keyword arg
         if len(args) == 1:
             self.__dict__['__stringdata'] = args[0];

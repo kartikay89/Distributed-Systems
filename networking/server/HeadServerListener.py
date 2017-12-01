@@ -2,7 +2,9 @@ import socket
 import threading
 import time
 
-from networking import TIMEOUT, DEBUG_PRINT, CLIENT_PORT, HEADSERVER_IP, SOCKET_BACKLOG_SIZE, safe_print, MessageReceiver
+from networking import CLIENT_PORT, DEBUG_PRINT, HEADSERVER_IP, SOCKET_BACKLOG_SIZE, TIMEOUT, \
+                       MessageReceiver, \
+                       safe_print
 
 
 class HeadServerListener(threading.Thread):
@@ -19,9 +21,9 @@ class HeadServerListener(threading.Thread):
             try:
                 sock, host = s.accept()
                 MessageReceiver(self.server, sock, host, TIMEOUT).start()
-            except Exception, e:
+            except socket.error as serr:
                 # Do not print error messages telling us that 'the resource is not available' (those are fine)
-                if 'Errno 11' not in str(e):
+                if serr.errno != 11:
                     self.hsl_print(e)
                 break
 

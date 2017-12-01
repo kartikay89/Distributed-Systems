@@ -1,8 +1,10 @@
 import socket
 import threading
 import time
-from networking import LOCAL, PORT, MAX_MSG_SIZE, DEBUG_PRINT, TIMEOUT, safe_print, ServerListener, ServerBroadcaster, MessageSender
 
+from networking import DEBUG_PRINT, LOCAL, MAX_MSG_SIZE, PORT, TIMEOUT, \
+                       ServerBroadcaster, ServerListener, MessageSender, \
+                       safe_print
 
 class Server(threading.Thread):
     def __init__(self, identifier):
@@ -13,6 +15,7 @@ class Server(threading.Thread):
         if not LOCAL:
             self.host = socket.gethostname()
         else:
+            # Server address space: 127.0.0.x
             # Prevent using 127.0.0.0 and 127.0.0.1 - I think those may be reserved
             self.host = '127.0.0.{:d}'.format(self.identifier + 3)
 
@@ -27,6 +30,10 @@ class Server(threading.Thread):
         # A lock-protected buffer for incoming messages
         self.message_lock = threading.RLock()
         self.messages = []
+
+        # A lock-protected list of clients that have connected to this server
+        self.clients_lock = threading.RLock()
+        self.clients = []
 
         # This thread will listen for pinging servers, reply if necessary and update the neighbours-list
         self.server_listener = ServerListener(self)
@@ -48,27 +55,3 @@ class Server(threading.Thread):
             for n in self.neighbours:
                 if n != self.host:
                     self.send_message(n, msg)
-
-    # This function assumes that there will be 1 Client connecting to our hostname
-    # As I'm writing this, THIS IS CURRENTLY NOT THE CASE (anymore).
-    # ONLY USE THIS FUNCTION AS INSPIRATION FOR OTHER FUNCTIONS
-    '''def test_interact_client(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # Allows sockets to bind to addresses that are already in use (useful if we kill the program, or if we used this address shortly before)
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        s.bind((self.host, PORT))
-        
-        self.s_print('listening on ' + self.host + ':' + str(PORT))
-        
-        # Listen with a backlog of max-size 1
-        s.listen(1)
-
-        client_socket, (client_host, client_port) = s.accept()
-        self.s_print('Incoming connection from {:s}:{:d}'.format(client_host, client_port))
-        
-        msg = client_socket.recv(MAX_MSG_SIZE)
-        self.s_print('Got msg: {:s}'.format(msg))
-        client_socket.send('<< Greetings from SERVER {:d} >>'.format(self.identifier))
-        
-        client_socket.close()
-        self.s_print('Stopped.')'''
