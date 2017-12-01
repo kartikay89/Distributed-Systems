@@ -16,43 +16,46 @@ def synchronized(call):
     return inner
 
 # package: distributed.systems.das
-# 
+#
 #  * The actual battlefield where the fighting takes place.
 #  * It consists of an array of a certain width and height.
-#  * 
-#  * It is a singleton, which can be requested by the 
+#  *
+#  * It is a singleton, which can be requested by the
 #  * getBattleField() method. A unit can be put onto the
 #  * battlefield by using the putUnit() method.
-#  * 
+#  *
 #  * @author Pieter Anemaet, Boaz Pat-El
-#  
+#
+
 class BattleField(IMessageReceivedHandler):
-    """ generated source for class BattleField """
-    #  The array of units 
+    #array of units
     map = []
 
-    #  The static singleton 
+    #statis singleton
     battlefield = None
 
-    #  Primary socket of the battlefield 
+    #primary socket of the BattleField
     serverSocket = None
 
-    #  The last id that was assigned to an unit. This variable is used to
-    # 	 * enforce that each unit has its own unique id.
-    # 	 
+    #The last id that was assigned to an unit
+    #used to enforce that each unit has its own unique id
     lastUnitID = 0
     serverID = "server"
     MAP_WIDTH = 25
     MAP_HEIGHT = 25
+
+
+class BattleField(IMessageReceivedHandler):
+    """ generated source for class BattleField """
+
+    MAP_WIDTH = 25
+    MAP_HEIGHT = 25
     units = None
 
-    # 
-    # 	 * Initialize the battlefield to the specified size 
-    # 	 * @param width of the battlefield
-    # 	 * @param height of the battlefield
-    # 	 
+    #Initialize the battlefield to the specified size
+    #@param width of the battlefield
+    #@param height of the battlefield
     def __init__(self, width, height):
-        """ generated source for method __init__ """
         super(BattleField, self).__init__()
         local = LocalSocket()
         with lock_for_object(self):
@@ -62,34 +65,27 @@ class BattleField(IMessageReceivedHandler):
             self.serverSocket.addMessageReceivedHandler(self)
             self.units = ArrayList()
 
-    # 
-    # 	 * Singleton method which returns the sole 
+    # 	 * Singleton method which returns the sole
     # 	 * instance of the battlefield.
-    # 	 * 
     # 	 * @return the battlefield.
-    # 	 
     @classmethod
     def getBattleField(cls):
-        """ generated source for method getBattleField """
         if cls.battlefield == None:
             cls.battlefield = BattleField(cls.MAP_WIDTH, cls.MAP_HEIGHT)
         return cls.battlefield
 
-    # 
     # 	 * Puts a new unit at the specified position. First, it
     # 	 * checks whether the position is empty, if not, it
     # 	 * does nothing.
     # 	 * In addition, the unit is also put in the list of known units.
-    # 	 * 
-    # 	 * @param unit is the actual unit being spawned 
+
+    # 	 * @param unit is the actual unit being spawned
     # 	 * on the specified position.
     # 	 * @param x is the x position.
     # 	 * @param y is the y position.
-    # 	 * @return true when the unit has been put on the 
+    # 	 * @return true when the unit has been put on the
     # 	 * specified position.
-    # 	 
     def spawnUnit(self, unit, x, y):
-        """ generated source for method spawnUnit """
         with lock_for_object(self):
             if self.map[x][y] != None:
                 return False
@@ -100,7 +96,6 @@ class BattleField(IMessageReceivedHandler):
 
     @synchronized
     def putUnit(self, unit, x, y):
-        """ generated source for method putUnit """
         if self.map[x][y] != None:
             return False
         self.map[x][y] = unit
@@ -108,9 +103,8 @@ class BattleField(IMessageReceivedHandler):
         return True
 
     def getUnit(self, x, y):
-        """ generated source for method getUnit """
         assert x >= 0 and len(map)
-        assert y >= 0 and len(length)
+        assert y >= 0 and len(map[0])
         return self.map[x][y]
 
     @synchronized
