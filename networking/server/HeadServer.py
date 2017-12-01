@@ -3,7 +3,9 @@ import random
 import threading
 import time
 
-from networking import PORT, Server, HeadServerListener, Message, safe_print
+from networking import PORT, \
+                       HeadServerListener, Message, Server, \
+                       safe_print
 
 # This class is used for the worker servers that are used for hosting games
 class HeadServer(Server):

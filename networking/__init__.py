@@ -29,4 +29,5 @@ from server.ServerBroadcaster import ServerBroadcaster
 from server.Server import Server
 from server.GameServer import GameServer
 from server.HeadServer import HeadServer
+from client.ClientListener import ClientListener
 from client.Client import Client

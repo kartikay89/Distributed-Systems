@@ -15,22 +15,7 @@ class Client(threading.Thread):
     def c_print(self, s):
         safe_print('[CLIENT {:d}]: {:s}'.format(self.identifier, s))
 
-    # Connect to the head server
-    def connect_headserver(self, s):
-        while True:
-            try:
-                s.connect((HEADSERVER_IP, CLIENT_PORT))
-                self.c_print('Connected to {:s}'.format((HEADSERVER_IP, CLIENT_PORT)))
-                break
-            except socket.error as serr:
-                if serr.errno == 111:
-                    # Yield to whatever other thread is ready to run (head server isn't ready yet)
-                    time.sleep(0)
-                else:
-                    self.c_print('Error: {:s}'.format(serr))
-            except Exception, e:
-                self.c_print('Error: {:s}'.format(e))
-
+    # Sends a message through socket s, indicating the client wishes to join a game
     def request_join(self, s):
         message = Message(type='GAME_JOIN', client=True)
         s.send(pickle.dumps(message))
@@ -44,7 +29,6 @@ class Client(threading.Thread):
 
     def run(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #self.connect_headserver(s)
         if not connect_to_dst(self, s, (HEADSERVER_IP, CLIENT_PORT), Client.c_print):
             return
         s.setblocking(0)

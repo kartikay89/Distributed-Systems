@@ -6,7 +6,7 @@ from networking import DEBUG_PRINT, LOCAL, MAX_MSG_SIZE, PORT, SOCKET_BACKLOG_SI
                        safe_print
 
 
-class ServerListener(threading.Thread):
+class ClientListener(threading.Thread):
     def __init__(self, server):
         threading.Thread.__init__(self)
         self.server = server

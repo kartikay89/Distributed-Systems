@@ -1,11 +1,15 @@
 import time
 
-from networking import PORT, Server, safe_print
+from networking import PORT, \
+                       Server, \
+                       safe_print
 
 # This class is used for the worker servers that are used for hosting games
 class GameServer(Server):
     def __init__(self, identifier):
         Server.__init__(self, identifier)
+        self.games = []
+        self.clients_to_games = {}
 
     def s_print(self, s):
         safe_print('[GAMESERVER {:d}]: {:s}'.format(self.identifier, s))

@@ -2,7 +2,9 @@ import socket
 import threading
 import time
 
-from networking import TIMEOUT, DEBUG_PRINT, CLIENT_PORT, HEADSERVER_IP, SOCKET_BACKLOG_SIZE, safe_print, MessageReceiver
+from networking import DEBUG_PRINT, CLIENT_PORT, HEADSERVER_IP, SOCKET_BACKLOG_SIZE, TIMEOUT, \
+                       MessageReceiver, \
+                       safe_print
 
 
 class HeadServerListener(threading.Thread):
