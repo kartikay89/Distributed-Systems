@@ -3,7 +3,7 @@ import socket
 import threading
 import time
 
-from networking import DEBUG_PRINT, MAX_MSG_SIZE, \
+from networking import DEBUG_PRINT, END_OF_MSG, MAX_MSG_SIZE, \
                        Message, \
                        await_confirm, connect_to_dst, safe_print
 
@@ -15,7 +15,7 @@ class MessageSender(threading.Thread):
         self.timeout = timeout
         self.host = host
         self.port = port
-        self.message = Message(message)
+        self.message = message
 
     def ms_print(self, s):
         if DEBUG_PRINT:
@@ -28,7 +28,7 @@ class MessageSender(threading.Thread):
             return
         s.setblocking(0)
         # Pickle and send
-        s.send(pickle.dumps(self.message))
+        s.send(pickle.dumps(self.message) + END_OF_MSG)
 
         # Wait for confirmation
         if not await_confirm(self, s, self.host, MessageSender.ms_print):

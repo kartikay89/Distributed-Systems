@@ -1,6 +1,7 @@
 import socket
 import threading
 import time
+
 from networking import DEBUG_PRINT, LOCAL, MAX_MSG_SIZE, PORT, SOCKET_BACKLOG_SIZE, TIMEOUT, \
                        Message, MessageReceiver, \
                        safe_print
@@ -35,7 +36,6 @@ class ClientListener(threading.Thread):
             return
         s.setblocking(0)
         self.cl_print('listening on {:s}:{:d}'.format(self.client.host, PORT))
-
         s.listen(SOCKET_BACKLOG_SIZE)
         
         while True:

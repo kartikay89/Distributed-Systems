@@ -1,7 +1,7 @@
 import time
 
 from networking import PORT, \
-                       Server, \
+                       Message, Server, \
                        safe_print
 
 # This class is used for the worker servers that are used for hosting games
@@ -18,24 +18,27 @@ class GameServer(Server):
         with self.message_lock:
             for message in self.messages:
                 self.s_print('Received message {:s}'.format(message))
-                message._reply_socket.close()
+                if message.type == 'GAME_JOIN':
+                    if message.host not in self.clients:
+                        self.clients.append(message.host)
+                    self.clients_to_games[message.host] = 'My lovely test game'
             self.messages = []
 
+    # Send all clients the current 'status' of their 'games'.
+    # TODO: only send updates when necessary (due to a status change in the game)
     def update_clients(self):
-        with self.clients_lock:
-            for client in self.clients:
-                self.send_message(client, Message(type='DRAW', contents='TEST!'))
+        for client in self.clients:
+            self.send_message(client, Message(type='DRAW', contents=self.clients_to_games[client]))
 
     def run(self):
         start_time = time.time()
         print_time = start_time
         current_time = print_time
         
-        # Stop after 5 seconds
         while True:
             current_time = time.time()
             self.handle_messages()
-            self.update_clients()
+            # Stop after 5 seconds
             if current_time - start_time >= 5:
                 with self.stop_lock:
                     self.stop = True
@@ -46,6 +49,8 @@ class GameServer(Server):
                 return
             elif current_time - print_time >= 1:
                 print_time = current_time
-                self.s_print(str(self.neighbours))
+                self.s_print('Known neighbours: {:s}'.format(self.neighbours))
+                # Test function to be updated
+                self.update_clients()
             # Yield
             time.sleep(0)

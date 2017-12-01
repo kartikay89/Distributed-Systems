@@ -2,9 +2,9 @@ import pickle
 import socket
 import threading
 
-from networking import CONFIRM, DEBUG_PRINT, MAX_MSG_SIZE, \
+from networking import CONFIRM, DEBUG_PRINT, END_OF_MSG, \
                        Message, \
-                       safe_print
+                       await_reply, safe_print
 
 # This class is used to receive messages from sockets without blocking the ServerListener
 class MessageReceiver(threading.Thread):
@@ -17,23 +17,17 @@ class MessageReceiver(threading.Thread):
 
     def mr_print(self, s):
         if DEBUG_PRINT:
-            safe_print('[MESSAGERECEIVER FOR {:d}]: {:s}'.format(self.owner.identifier, s))
+            safe_print('[MESSAGERECEIVER FOR {:s}]: {:s}'.format(self.owner.host, s))
 
     def run(self):
         self.sock.settimeout(self.timeout)
         try:
-            pickled_message = self.sock.recv(MAX_MSG_SIZE)
-            message = pickle.loads(pickled_message)
-            message._reply_socket = self.sock
+            message = await_reply(self, self.sock, self.host, MessageReceiver.mr_print)
+            #self.mr_print('We got {:s}'.format(message))
             # Send confirmation
-            self.sock.send(pickle.dumps(Message(CONFIRM)))
+            self.sock.send(pickle.dumps(Message(CONFIRM)) + END_OF_MSG)
             # Append to message buffer
             with self.owner.message_lock:
                 self.owner.messages.append(message)
-            # If the message was sent by a client, update client
-            if message.client:
-                with self.owner.clients_lock:
-                    if message.host not in self.owner.clients:
-                        self.owner.clients.append(message.host)
         except Exception, e:
             self.mr_print('Error while trying to receive message from {:s}: {:s}'.format(str(self.host), e))

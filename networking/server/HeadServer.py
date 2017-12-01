@@ -1,4 +1,3 @@
-import pickle
 import random
 import threading
 import time
@@ -18,17 +17,21 @@ class HeadServer(Server):
     def s_print(self, s):
         safe_print('[HEADSERVER {:d}]: {:s}'.format(self.identifier, s))
 
-    # Uses the socket opened by the client to communicate which server the client should connect to
+    # Tells a client which server to connect to
     def redirect_client(self, message):
+        # First, add this client to our client list if it isn't in there already
+        if message.host not in self.clients:
+            self.clients.append(message.host)
+
         with self.peer_lock:
             if len(self.neighbours) == 0:
-                self.s_print('No neighbours')
+                #self.s_print('No neighbours')
                 return False
             # TODO: improve
             host = random.choice(self.neighbours)
             self.s_print('Telling client to connect to {:s}'.format(host))
             reply = Message(type='REDIRECT', host=host)
-            message._reply_socket.send(pickle.dumps(reply))
+            self.send_message(message.host, reply)
             return True
 
     # Read messages from our message buffer and deal with them
@@ -37,17 +40,17 @@ class HeadServer(Server):
         remaining_messages = []
         with self.message_lock:
             for message in self.messages:
-                self.s_print('Received message {:s}'.format(message))
                 # A client wishes to join a game
                 if message.type == 'GAME_JOIN':
                     # Try to find him a game, and if we fail we'll try again later
                     if self.redirect_client(message):
                         # Our client finally got closure, so we can close the socket
-                        message._reply_socket.close()
                         continue
+                else:
+                    self.s_print('Received message of unknown type: {:s}'.format(message))
+                    continue
                 # If we reach this point, the message hasn't been dealt with so we keep it
                 remaining_messages.append(message)
-                self.s_print('Couldn\'t deal with {:d} msgs'.format(len(remaining_messages)))
             self.messages = remaining_messages
 
     def run(self):
@@ -62,7 +65,6 @@ class HeadServer(Server):
             if current_time - start_time >= 5:
                 with self.clients_lock:
                     self.s_print('Clients connected: {:s}'.format(str(self.clients)))
-                    self.clients = []
                 with self.stop_lock:
                     self.stop = True
                 # Wait for our listener and broadcaster threads to quit
@@ -73,5 +75,5 @@ class HeadServer(Server):
                 break
             elif current_time - iter_time >= 1:
                 iter_time = current_time
-                #self.send_to_all('Greetings from {:s}'.format(self.host))
+                #self.send_to_all(Message('Greetings from {:s}'.format(self.host)))
             time.sleep(0)
