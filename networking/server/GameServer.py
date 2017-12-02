@@ -22,6 +22,10 @@ class GameServer(Server):
                     if message.host not in self.clients:
                         self.clients.append(message.host)
                     self.clients_to_games[message.host] = 'My lovely test game'
+
+                # Unit movement
+                if message.type == 'UNIT_MOVE':
+                    safe_print("UNIT_MOVE from %s direction: %d", message.host, message.direction)
             self.messages = []
 
     # Send all clients the current 'status' of their 'games'.
