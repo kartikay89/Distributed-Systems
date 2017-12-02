@@ -1,9 +1,6 @@
 from random import randint
 
 class Unit():
-
-    self.dead = False
-
     def __init__(self):
 
         #to make each each unit possess one square only
@@ -23,30 +20,33 @@ class Unit():
         else:
             return True
 
+    def unit_move(self, direction):
+        pass
+
     def player_move(self, choice):
-        current_x = self.
+        current_x = self.x
         if(choice == 'W' or choice == 'w'):
             if(self.check_boundary(current_x, current_y-1) == False):
-                return Flase
+                return False
             else:
                 self.player_position = [current_x, current_y-1]
                 return True
 
         elif(choice == 'A' or choice == 'a'):
             if(self.check_boundary(current_x-1, current_y) == False):
-                return Flase
+                return False
             else:
                 self.player_position = [current_x-1, current_y]
                 return True
         elif(choice == 'S' or choice == 's'):
             if(self.check_boundary(current_x, current_y+1) == False):
-                return Flase
+                return False
             else:
                 self.player_position = [current_x, current_y+1]
                 return True
         elif(choice == 'D' or choice == 'd'):
             if(self.check_boundary(current_x+1, current_y) == False):
-                return Flase
+                return False
             else:
                 self.player_position = [current_x+1, current_y]
                 return True

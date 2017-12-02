@@ -25,7 +25,7 @@ class GameServer(Server):
 
                 # Unit movement
                 if message.type == 'UNIT_MOVE':
-                    safe_print("UNIT_MOVE from %s direction: %d", message.host, message.direction)
+                    safe_print("UNIT_MOVE from " + message.host + " at direction " + message.direction)
             self.messages = []
 
     # Send all clients the current 'status' of their 'games'.

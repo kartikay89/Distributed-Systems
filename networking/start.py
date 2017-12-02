@@ -30,6 +30,9 @@ if __name__ == '__main__':
     clients = []
     head_server = None
 
+    # TOD debug
+    nservers = 2
+
     for i in range(nservers):
         if i == 0:
             head_server = HeadServer(i)

@@ -1,11 +1,12 @@
-import pickle
+import socket
 import socket
 import threading
 import time
 
-from networking import CLIENT_PORT, END_OF_MSG, HEADSERVER_IP, LOCAL, MAX_MSG_SIZE, TIMEOUT, \
-                       ClientListener, Message, MessageSender, \
-                       await_confirm, await_reply, connect_to_dst, safe_print
+from networking import CLIENT_PORT, HEADSERVER_IP, LOCAL, TIMEOUT, \
+    ClientListener, Message, MessageSender, \
+    safe_print
+from units.Player import Player
 
 
 class Client(threading.Thread):
@@ -31,6 +32,9 @@ class Client(threading.Thread):
         self.client_listener = ClientListener(self)
         self.client_listener.start()
 
+        # Add player instance
+        self.player = Player()
+
     def c_print(self, s):
         safe_print('[CLIENT {:d}]: {:s}'.format(self.identifier, s))
 
@@ -43,8 +47,15 @@ class Client(threading.Thread):
                     pass
                 elif message.type == 'REDIRECT':
                     self.server_host = message.host
+                    self.c_print("Redirecting to game server")
                     message = Message(type='GAME_JOIN', client=True, host=self.host)
                     MessageSender(self, TIMEOUT, self.server_host, CLIENT_PORT, message).start()
+
+                    # Debug
+                    time.sleep(1)
+                    move_message = Message(type='UNIT_MOVE', host="garbage", client=True, direction='LEFT')
+                    MessageSender(self, TIMEOUT, self.server_host, CLIENT_PORT, move_message).start()
+
                 else:
                     self.c_print('Got message of unknown type: {:s}'.format(message))
             self.messages = []
@@ -61,6 +72,9 @@ class Client(threading.Thread):
 
         message = Message(type='GAME_JOIN', client=True, host=self.host)
         MessageSender(self, TIMEOUT, HEADSERVER_IP, CLIENT_PORT, message).start()
+
+        # move_message = Message(type='UNIT_MOVE', client=True, host=self.host, direction='LEFT')
+        # MessageSender(self, TIMEOUT, HEADSERVER_IP, CLIENT_PORT, move_message).start()
         
         while True:
             self.handle_messages()
