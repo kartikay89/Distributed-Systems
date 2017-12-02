@@ -12,7 +12,8 @@ from networking import Server, GameServer, HeadServer, Client
 # Use argparse to parse args (useful when we start having many of them)
 def get_args():
     parser = argparse.ArgumentParser(description='Start a number of servers in an equal number of threads.')
-    parser.add_argument('-n', '--number', type=int, default=4, help='Number of servers to start')
+    parser.add_argument('-n', '--number_servers', type=int, default=4, help='Number of servers to start')
+    parser.add_argument('-c', '--number_clients', type=int, default=4, help='Number of clients to start')
     parser.add_argument('-v', '--verbose', action='store_true', help='Generate verbose output') # Not used yet, but can come in handy later
     return parser.parse_args()
 
@@ -24,7 +25,8 @@ def do_nothing(a):
 
 if __name__ == '__main__':
     args = get_args()
-    nservers = args.number
+    nservers = args.number_servers
+    nclients = args.number_clients
 
     servers = []
     clients = []
@@ -38,6 +40,6 @@ if __name__ == '__main__':
             servers.append(GameServer(i))
             servers[-1].start()
 
-    for i in range(1):
+    for i in range(nclients):
         clients.append(Client(i))
         clients[-1].start()

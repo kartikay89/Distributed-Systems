@@ -40,7 +40,6 @@ class Client(threading.Thread):
             for message in self.messages:
                 if message.type == 'DRAW':
                     self.c_print('We will DRAW this message: {:s}'.format(message.contents))
-                    pass
                 elif message.type == 'REDIRECT':
                     self.server_host = message.host
                     message = Message(type='GAME_JOIN', client=True, host=self.host)

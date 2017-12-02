@@ -1,0 +1,48 @@
+Algorithm:
+
+Connecting
+
+ * Players connects to HeadServer (with or without providing a game ID)
+ * HeadServer either creates or looks up the game (depending on the ID)
+    * HeadServer needs a mapping of game IDs to lists of GameServers
+ * HeadServer replies by sending game ID and the IPs of all GameServers that are hosting this game
+ * Client sends a message to all GameServers (this will cause a 'spawn' command to be executed - which ties in with the next section)
+ * One GameServer will decide to serve this client's updates.
+
+ Playing
+
+ * Games are stored as objects, containing at least:
+    * A unique ID
+    * A list of all servers that host this game
+    * A list of all players that are in this game, and from which server they receive their updates
+ * Clients send their commands to all servers. All servers process them individually.
+    * ALL game actions are treated as commands, even those that are not directly triggered by Clients
+ * Clients only receive updates from ONE of the servers.
+ * For each game:
+    * Servers keep track of which commands are EXECUTED.
+        * (Commands that had no effect (ie. illegal moves, or commands that were issued within the client's cooldown) are NOT stored.)
+    * Time stamps are not used, only the ORDER of executed commands is stored
+    * Every <interval> (probably less than 1) seconds, the servers that host the game exchange their recent command buffers.
+        * Only the first <y> commands are checked, with <y> being the length of SMALLEST command buffer that was exchanged
+            * This is because some servers may simply not have received certain commands yet!
+            * Servers that executed more than <y> commands store the excess in the 'next' buffer
+        * If all server agree on the first <y> commands: great!
+        * If not:
+            * The majority wins - and each server can see for itself what that is.
+            * In case of a tie:
+                * Look at which servers backed up the winning 'votes'
+                * Whichever 'vote' is backed by the server the the LOWEST identifier wins.
+                    * (This is very arbitrary, but it means servers can make a decision without exchanging more messages).
+            * Servers that disagreed with the winning 'vote' need toupdate their state, and notify their clients.
+            * If a client notices that their update server disagreed a certain amount of times within a certain time period, they will request a new server.
+                * Which server they choose should be chosen based on a simple scheme that does not need any message exchanges 
+                    * (For instance, the server with the lowest identifier)
+                * (We could consider excommunicating servers that disagree too often.)
+        * Finally, after every state exchange/decision, each server updates some kind of checkpoint in the game state
+
+
+Crashing clients (disconnects)
+
+ * The game state stores whether or not a player is dead
+ * Reconnecting will be just like connecting (with a provided game ID)
+ * The servers wil notice that the player is already in the game, and won't 'spawn' the player
