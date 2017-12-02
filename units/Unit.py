@@ -14,7 +14,42 @@ class Unit():
         if self.hp <= 0:
             self.dead = True
 
-# d
+    #to ensure player can't get out of the 25x25 grid
+    def check_boundary(self):
+        min_width = 0
+        min_height = 0
+        if(new_x < min_width or new_x == self.max_width):
+            return False
+        else:
+            return True
+
+    def player_move(self, choice):
+        current_x = self.
+        if(choice == 'W' or choice == 'w'):
+            if(self.check_boundary(current_x, current_y-1) == False):
+                return Flase
+            else:
+                self.player_position = [current_x, current_y-1]
+                return True
+
+        elif(choice == 'A' or choice == 'a'):
+            if(self.check_boundary(current_x-1, current_y) == False):
+                return Flase
+            else:
+                self.player_position = [current_x-1, current_y]
+                return True
+        elif(choice == 'S' or choice == 's'):
+            if(self.check_boundary(current_x, current_y+1) == False):
+                return Flase
+            else:
+                self.player_position = [current_x, current_y+1]
+                return True
+        elif(choice == 'D' or choice == 'd'):
+            if(self.check_boundary(current_x+1, current_y) == False):
+                return Flase
+            else:
+                self.player_position = [current_x+1, current_y]
+                return True
 
 # import abc
 # from _thread import RLock
