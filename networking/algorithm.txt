@@ -18,6 +18,10 @@ Connecting
  * Clients send their commands to all servers. All servers process them individually.
     * ALL game actions are treated as commands, even those that are not directly triggered by Clients
  * Clients only receive updates from ONE of the servers.
+    * This is determined as follows (this can be determined by each server individually):
+        * The IP addresses of all servers serving this game are hashed, and so is the IP address of the client
+        * The Levenshtein distance between the client's IP-hash and each of the servers' IP-hashes is calculated
+        * The smallest distance determines which server serves this client
  * For each game:
     * Servers keep track of which commands are EXECUTED.
         * (Commands that had no effect (ie. illegal moves, or commands that were issued within the client's cooldown) are NOT stored.)

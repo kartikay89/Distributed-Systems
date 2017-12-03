@@ -1,5 +1,11 @@
-class MessageRequest(object):
-    spawnUnit, getUnit, dealDamage, removeUnit = range(4)
+# This class is used for defining the type of a Message
+class MessageType(object):
+    # REDIRECT: Sent by the HeadServer to a client, telling him which GameServers host a game
+    # GAME_JOIN: Sent by a client, first to the HeadServer and later (when it knows which GameServers to connect to) to the GameServers
+    # GAME_UPDATE: Sent by GameServers to client, telling them to update their GUI
+    # GAME_SYNC: Sent by GameServers to each other, to decide on the latest state of a given game
+    # GAME_START: Sent by HeadServers to GameServers, instructing them to start a certain game (with properties defined in the Game-object in the message)
+    REDIRECT, GAME_JOIN, GAME_UPDATE, GAME_SYNC, GAME_START, GAME_ACTION = range(6)
 
 
 class Message(object):
@@ -20,7 +26,3 @@ class Message(object):
             return self.__dict__['__stringdata']
         else:
             return '[MESSAGE: {:s}]'.format(str(self.__dict__))
-
-    # Called when an attribute should be set
-    #def __setattr__(self, name, value):
-    #    self.__dict__[name] = value

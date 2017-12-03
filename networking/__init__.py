@@ -13,6 +13,8 @@ HEADSERVER_IP       = '127.0.0.250'
 DEBUG_PRINT         = True
 CONFIRM             = 'Thanks'
 END_OF_MSG          = '\nEOM\n'
+NSERVERS_PER_GAME   = 2
+GAME_SYNC_INTERVAL  = 1.0 # Should eventually be made smaller
 
 # When multiple threads are printing at the same time, the newlines are not printed at the same moment as the string
 # This function takes care of this. Alternatively, just call sys.stdout.write(<...>)
@@ -21,9 +23,12 @@ def safe_print(s):
     sys.stdout.flush()
 
 from helper_functions import await_confirm, await_reply, connect_to_dst
-from Message import Message
+from Message import MessageType, Message
 from MessageReceiver import MessageReceiver
 from MessageSender import MessageSender
+from GameAction import GameActionType, GameAction
+from GameSynchronizer import GameSynchronizer
+from DummyGame import DummyGame
 from server.ServerListener import ServerListener
 from server.HeadServerListener import HeadServerListener
 from server.ServerBroadcaster import ServerBroadcaster
