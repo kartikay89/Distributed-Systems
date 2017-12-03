@@ -14,8 +14,20 @@ def battle_field(board):
 
     # Creating surface of (width, height), and its window.
     surface = pygame.display.set_mode((surface_size, surface_size))
+
+    # Loading the dragon on the battle field
+    dragon = pygame.image.load("Dragon1.PNG")
+    dragon1 = pygame.transform.scale(dragon, (80,100))
+
+    # Loading superman
+    player = pygame.image.load("Superman.PNG")
+    player1 = pygame.transform.scale(player, (80, 100))
+
+    # Using offset to centre the dragon on the square
+    dragon_offset = (square_size - dragon1.get_width()) // 2
+
     # Adding the name for the game
-    pygame.display.set_caption("Dragon slayer")
+    pygame.display.set_caption("Dragon Arena")
 
     while True:
 
@@ -32,12 +44,19 @@ def battle_field(board):
                 surface.fill(colors[c_indx], the_square)
                 c_indx = (c_indx + 1) % 2
 
-
+        # drawing Dragons
+        for (col, row) in enumerate(board):
+            surface.blit(dragon1, (100, 100))
 
         pygame.display.flip()
 
+        # drawing Player
+        for (col, row) in enumerate(board):
+            surface.blit(player1, (50, 30))
+
+        pygame.display.flip()
 
     pygame.quit()
 
 if __name__ == "__main__":
-    battle_field([0, 5, 3, 1, 6, 4, 2])    
+    battle_field([0, 5, 3, 1, 6, 4, 2])       
