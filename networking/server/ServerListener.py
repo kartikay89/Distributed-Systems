@@ -45,7 +45,7 @@ class ServerListener(threading.Thread):
             return
         peer_s.setblocking(0)
         client_s.setblocking(0)
-        self.sl_print('listening on {:s}:{:d} and {:s}:{:d}'.format(self.server.host, PORT, self.server.host, CLIENT_PORT))
+        #self.sl_print('listening on {:s}:{:d} and {:s}:{:d}'.format(self.server.host, PORT, self.server.host, CLIENT_PORT))
         peer_s.listen(SOCKET_BACKLOG_SIZE)
         client_s.listen(SOCKET_BACKLOG_SIZE)
         

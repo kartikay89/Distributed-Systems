@@ -31,7 +31,7 @@ class HeadServerListener(threading.Thread):
         # Set up socket to receive messages from peers
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.hsl_print('going to listen on ' + HEADSERVER_IP + ':' + str(CLIENT_PORT))
+        #self.hsl_print('going to listen on ' + HEADSERVER_IP + ':' + str(CLIENT_PORT))
         s.bind((HEADSERVER_IP, CLIENT_PORT))
         s.setblocking(0)
         s.listen(SOCKET_BACKLOG_SIZE)

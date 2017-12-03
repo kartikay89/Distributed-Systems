@@ -1,7 +1,8 @@
 import threading
 
-from networking import GAME_SYNC_INTERVAL, \
-                       GameAction, GameActionType, GameSynchronizer, Message
+from networking import DEBUG_PRINT, GAME_SYNC_INTERVAL, \
+                       GameAction, GameActionType, GameSynchronizer, Message, \
+                       safe_print
 
 
 class DummyGame(object):
@@ -15,15 +16,20 @@ class DummyGame(object):
         self.synchronizer = GameSynchronizer(self.server, self, GAME_SYNC_INTERVAL)
         self.synchronizer.start()
         self.checkpoint = None # Set to a copy of the last gamestate that all servers agreed on
+        self.checkpoint_nr = 0 # Set to the NUMBER OF ACTIONS that have been executed in the current checkppint (used to identify checkpoints)
 
         self.sync_msg_lock = threading.RLock()
         self.sync_messages = [] # Will contain messages sent by the other servers that host this game, used to sync our states
 
         self.buffer_lock = threading.RLock()
-        self.command_buffer = [] # Will contain all commands that the servers have not yet agreed on
+        self.action_buffer = [] # Will contain all commands that the servers have not yet agreed on
     
     def __repr__(self):
-        return '[GAME: {:s}]'.format(str(self.__dict__))
+        return '[GAME {:d} served by server {:d} at {:s}]'.format(self.identifier, self.server.identifier, self.server.host)
+
+    def dg_print(self, s):
+        if DEBUG_PRINT:
+            safe_print('[GAME (game {:d}, server {:d})]: {:s}'.format(self.identifier, self.server.identifier, s))
 
     def perform_action(self, action):
         performed = True # Should actually be false here, but for now I want to store all actions
@@ -36,4 +42,4 @@ class DummyGame(object):
         # Store action, if it was actually performed (and not illegal)
         if performed:
             with self.buffer_lock:
-                self.command_buffer.append(action)
+                self.action_buffer.append(action)

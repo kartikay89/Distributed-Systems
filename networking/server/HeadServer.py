@@ -19,7 +19,7 @@ class HeadServer(Server):
         self.game_counter = 0
 
     def s_print(self, s):
-        safe_print('[HEADSERVER {:d} @ {:s}]: {:s}'.format(self.identifier, self.host, s))
+        safe_print('[HEADSERVER {:d} at {:s}]: {:s}'.format(self.identifier, self.host, s))
 
     # Find a number of game servers (currently done randomly)
     def find_gameservers(self, nservers):
@@ -68,7 +68,7 @@ class HeadServer(Server):
                 #self.s_print('Not enough neighbours ({:d})'.format(len(self.neighbours)))
                 return False
         game_id, game_servers = self.get_gamedata(message.game_id)
-        self.s_print('Telling client to connect to {:s}'.format(game_servers))
+        self.s_print('Telling client {:d} at {:s} to connect to {:s}'.format(message.client_id, message.host, game_servers))
         reply = Message(type=MessageType.REDIRECT, game_id=game_id, servers=game_servers)
         self.send_message(message.host, reply)
         return True

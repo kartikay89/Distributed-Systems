@@ -15,5 +15,12 @@ class GameAction(object):
         for key, value in kwargs.items():
             self.__dict__[key] = value
 
+    # Lovely Pythonic built-in function overrides
     def __repr__(self):
         return '[GAME_ACTION <{:s}>: {:s}]'.format(GameActionType.type_as_str[self.type], str(self.__dict__))
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not self == other

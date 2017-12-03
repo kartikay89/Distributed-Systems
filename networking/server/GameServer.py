@@ -14,8 +14,13 @@ from networking import PORT, \
 class GameServer(Server):
     def __init__(self, identifier):
         Server.__init__(self, identifier)
+
+        self.games_lock = threading.RLock()
         self.games = {} # Maps ids to game objects
         self.clients_to_games = {} # Maps clients to game ids
+
+    def __repr__(self):
+        return '[GAMESERVER {:d} at {:s}]'.format(self.identifier, self.host)
 
     def s_print(self, s):
         safe_print('[GAMESERVER {:d} @ {:s}]: {:s}'.format(self.identifier, self.host, s))
@@ -36,7 +41,7 @@ class GameServer(Server):
         # Store the result.
         # Each server will calculate and store this data separately, thereby reaching consensus as to who is served by whom
         game.clients_to_update_servers[client] = result
-        self.s_print('We think client {:s} should be served by {:s} for game {:d}'.format(client, result, game.identifier))
+        #self.s_print('We think client {:s} should be served by {:s} for game {:d}'.format(client, result, game.identifier))
 
     # Attempt to join a client to a game
     def game_join(self, message):
@@ -44,13 +49,14 @@ class GameServer(Server):
             self.clients.append(message.host)
 
         # check if we host this game
-        game = self.games.get(message.game_id)
+        with self.games_lock:
+            game = self.games.get(message.game_id)
         if not game:
             # We don't serve this game
             #self.s_print('Client {:d} can\'t join game {:d} (we don\'t serve it)'.format(message.client_id, message.game_id))
             return False
         else:
-            self.s_print('Client {:d} joined game {:d}'.format(message.client_id, message.game_id))
+            self.s_print('Client {:d} at {:s} joined game {:d}'.format(message.client_id, message.host, message.game_id))
             # Perform_action should cancel this action if the player is already in the game
             game.perform_action(GameAction(type=GameActionType.SPAWN, player=message.host))
             self.clients_to_games[message.host] = message.game_id
@@ -62,7 +68,8 @@ class GameServer(Server):
         game = DummyGame(game_id, self)
         game.servers = servers
         game.checkpoint = copy.copy(game)
-        self.games[game.identifier] = game
+        with self.games_lock:
+            self.games[game.identifier] = game
         self.s_print('Started up game {:s}'.format(game))
 
     # Read messages from our message buffer and deal with them
@@ -81,14 +88,16 @@ class GameServer(Server):
                     continue
                 elif message.type == MessageType.GAME_ACTION:
                     # Currently doesn't do much because we only work with dummy games
-                    self.games[messages.game_id].perform_action(message)
+                    with self.games_lock:
+                        self.games[messages.game_id].perform_action(message)
                     continue
                 elif message.type == MessageType.GAME_SYNC:
                     # This is a synchronization message sent by another server, related to a specific game
                     # It will be dealt by by the game's GameSynchronizer
-                    game = self.games[message.game_id]
-                    with game.sync_msg_lock:
-                        game.sync_messages.append(message)
+                    with self.games_lock:
+                        game = self.games[message.game_id]
+                        with game.sync_msg_lock:
+                            game.sync_messages.append(message)
                     continue
                 else:
                     self.s_print('Received message of unknown type: {:s}'.format(message))
@@ -103,7 +112,8 @@ class GameServer(Server):
         for client in self.clients:
             # Find game
             game_id = self.clients_to_games.get(client)
-            game = self.games.get(game_id)
+            with self.games_lock:
+                game = self.games.get(game_id)
             if game:
                 # Check if we are the server that should be sending updates to this client
                 if game.clients_to_update_servers[client] == self.host:
@@ -128,9 +138,9 @@ class GameServer(Server):
                 return
             elif current_time - print_time >= 1:
                 print_time = current_time
-                with self.peer_lock:
-                    self.s_print('Known neighbours: {:s}'.format(self.neighbours))
-                self.s_print('Current games: {:s}'.format(self.games))
+                #with self.peer_lock:
+                #    self.s_print('Known neighbours: {:s}'.format(self.neighbours))
+                #self.s_print('Current games: {:s}'.format(self.games))
                 # Test function to be updated
                 self.update_clients()
             # Yield

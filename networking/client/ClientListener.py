@@ -35,7 +35,7 @@ class ClientListener(threading.Thread):
             self.cl_print('failed to bind, self.client.host = {:s} ({:s})'.format(self.client.host, e))
             return
         s.setblocking(0)
-        self.cl_print('listening on {:s}:{:d}'.format(self.client.host, PORT))
+        #self.cl_print('listening on {:s}:{:d}'.format(self.client.host, PORT))
         s.listen(SOCKET_BACKLOG_SIZE)
         
         while True:
