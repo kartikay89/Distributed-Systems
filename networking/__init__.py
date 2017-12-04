@@ -15,6 +15,7 @@ CONFIRM             = 'Thanks'
 END_OF_MSG          = '\nEOM\n'
 NSERVERS_PER_GAME   = 2
 GAME_SYNC_INTERVAL  = 1.0 # Should eventually be made smaller
+GRID_SIZE           = 25
 
 # When multiple threads are printing at the same time, the newlines are not printed at the same moment as the string
 # This function takes care of this. Alternatively, just call sys.stdout.write(<...>)

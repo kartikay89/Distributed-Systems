@@ -12,6 +12,7 @@ class GameActionType(object):
 class GameAction(object):
     def __init__(self, *args, **kwargs):
         self.type = None
+        self.player = None
         for key, value in kwargs.items():
             self.__dict__[key] = value
 
