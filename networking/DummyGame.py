@@ -139,6 +139,9 @@ class DummyGame(object):
         player_unit.field = target_field
         return True
 
+    #def heal(self, action):
+
+
     # Remove a unit from our board
     def remove_unit(self, unit):
         unit.field.contents = None
@@ -181,6 +184,8 @@ class DummyGame(object):
             performed = self.move(action)
         elif action.type == GameActionType.ATTACK:
             performed = self.attack(action)
+        elif action.type == GameActionType.HEAL:
+            performed = self.heal(action)
         # etc.
         # Store action, if it was actually performed (and not illegal)
         if performed:
