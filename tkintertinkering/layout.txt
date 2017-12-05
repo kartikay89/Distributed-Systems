@@ -1,0 +1,7 @@
+if not LOCAL:
+    Every thread spawns a DrawThread
+    Every DrawThread gets a Queue, and uses that to update a DrawClass inheriting from Tkinter.Frame
+else:
+    Main thread spawns as many DrawClasses as clients
+    Every client gets a Queue and pushes updates to it
+    Main thread reads from all queues in a loop, updates DrawClasses
