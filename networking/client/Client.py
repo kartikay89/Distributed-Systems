@@ -1,3 +1,4 @@
+from Queue import Queue
 import pickle
 import socket
 import threading
@@ -5,11 +6,11 @@ import time
 
 from networking import CLIENT_PORT, END_OF_MSG, HEADSERVER_IP, LOCAL, MAX_MSG_SIZE, TIMEOUT, \
                        ClientListener, Message, MessageSender, MessageType, \
-                       await_confirm, await_reply, connect_to_dst, draw, safe_print
+                       await_confirm, await_reply, connect_to_dst, safe_print
 
 
 class Client(threading.Thread):
-    def __init__(self, identifier):
+    def __init__(self, identifier, queue=None):
         threading.Thread.__init__(self)
         self.identifier = identifier
         # Determine what IP to bind our sockets to
@@ -20,6 +21,7 @@ class Client(threading.Thread):
             self.host = '127.0.1.{:d}'.format(self.identifier + 3)
         self.server_hosts = None
         self.game_id = None
+        self.draw_queue = queue
 
         # A lock-protected variable used to communicate that this thread is stopping (used by the client's listener)
         self.stop_lock = threading.RLock()
@@ -35,6 +37,12 @@ class Client(threading.Thread):
     def c_print(self, s):
         safe_print('[CLIENT {:d}]: {:s}'.format(self.identifier, s))
 
+    def draw(self, units):
+        if LOCAL:
+            self.draw_queue.put(units)
+        else:
+            pass
+
     # Wrapper function for sending a message to a given host
     def send_message(self, host, message):
         message.host = self.host
@@ -48,7 +56,7 @@ class Client(threading.Thread):
             for message in self.messages:
                 if message.type == MessageType.GAME_UPDATE:
                     self.c_print('We got GAME_UPDATE: {:s}'.format(message.contents))
-                    draw(message.contents)
+                    self.draw(message.contents)
                 elif message.type == MessageType.REDIRECT:
                     self.server_hosts = message.servers
                     self.game_id = message.game_id

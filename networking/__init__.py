@@ -29,7 +29,7 @@ from MessageReceiver import MessageReceiver
 from MessageSender import MessageSender
 from GameAction import GameActionType, GameAction
 from GameSynchronizer import GameSynchronizer
-from DummyGame import DummyGame
+from DummyGame import DummyGame, Dragon, Player
 from server.ServerListener import ServerListener
 from server.HeadServerListener import HeadServerListener
 from server.ServerBroadcaster import ServerBroadcaster
@@ -37,5 +37,5 @@ from server.Server import Server
 from server.GameServer import GameServer
 from server.HeadServer import HeadServer
 from client.ClientListener import ClientListener
-from Battle_field import draw
+from client.DASBoard import DASBoard
 from client.Client import Client

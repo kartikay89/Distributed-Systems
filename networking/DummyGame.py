@@ -27,7 +27,7 @@ class Player(Unit):
         self.player = player
 
     def __repr__(self):
-        return '[PLAYER (ap {:d}, hp {:d})]'.format(self.ap, self.hp)
+        return '[PLAYER at {:s} (ap {:d}, hp {:d})]'.format(self.field.position, self.ap, self.hp)
 
 
 class Dragon(Unit):
@@ -37,7 +37,7 @@ class Dragon(Unit):
         self.identifier = identifier
 
     def __repr__(self):
-        return '[DRAGON (ap {:d}, hp {:d})]'.format(self.ap, self.hp)
+        return '[DRAGON at {:s} (ap {:d}, hp {:d})]'.format(self.field.position, self.ap, self.hp)
 
 
 class Field(object):

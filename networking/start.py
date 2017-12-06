@@ -1,12 +1,16 @@
+from Queue import Queue
 import os
 import sys
+import Tkinter as tk
 
 # Append current working directory to the paths in which Python looks for modules
 sys.path.insert(0, os.path.abspath('..'))
 
 import argparse
 
-from networking import Server, GameServer, HeadServer, Client
+from networking import GRID_SIZE, \
+                       Client, DASBoard, GameServer, HeadServer, Server, \
+                       safe_print
 
 
 # Use argparse to parse args (useful when we start having many of them)
@@ -30,7 +34,11 @@ if __name__ == '__main__':
 
     servers = []
     clients = []
+    queues = []
+    boards = []
     head_server = None
+
+    root = tk.Tk()
 
     for i in range(nservers):
         if i == 0:
@@ -41,5 +49,24 @@ if __name__ == '__main__':
             servers[-1].start()
 
     for i in range(nclients):
-        clients.append(Client(i))
+        queues.append(Queue())
+        clients.append(Client(i, queue=queues[-1]))
         clients[-1].start()
+        if i == 0:
+            board = DASBoard(root, 32, "Superman.png", "Dragon.png", board_size=(GRID_SIZE,GRID_SIZE))
+        else:
+            top_level = tk.Toplevel(root)
+            board = DASBoard(top_level, 32, "Superman.png", "Dragon.png", board_size=(GRID_SIZE,GRID_SIZE))
+        board.pack(side="top", fill="both", expand="true", padx=4, pady=4)
+        boards.append(board)
+
+    while True:
+        for i in range(len(boards)):
+            units = None
+            while not queues[i].empty():
+                units = queues[i].get()
+            if units:
+                safe_print('Units: {:s}'.format(units))
+                boards[i].update_units(units)
+            boards[i].canvas.update_idletasks()
+            boards[i].canvas.update()
