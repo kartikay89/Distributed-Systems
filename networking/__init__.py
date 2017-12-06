@@ -37,6 +37,5 @@ from server.Server import Server
 from server.GameServer import GameServer
 from server.HeadServer import HeadServer
 from client.ClientListener import ClientListener
+from Battle_field import draw
 from client.Client import Client
-
-from Battle_field import test

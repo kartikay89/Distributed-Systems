@@ -45,11 +45,11 @@ def battle_field(board, units):
                 c_indx = (c_indx + 1) % 2
 
         for unit in units:
-        	x, y = unit.field.position
-        	if type(unit) == Dragon:
-        		surface.blit(dragon_img, (x * square_size, y * square_size))
-        	else:
-        		surface.blit(player_img, (x * square_size, y * square_size))
+            x, y = unit.field.position
+            if type(unit) == Dragon:
+                surface.blit(dragon_img, (x * square_size, y * square_size))
+            else:
+                surface.blit(player_img, (x * square_size, y * square_size))
         pygame.display.flip()
     pygame.quit()
 

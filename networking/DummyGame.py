@@ -56,7 +56,8 @@ class DummyGame(object):
         self.server = server
         self.servers = [] # List of ips belonging to the servers that host this game
         self.clients_to_update_servers = {} # Maps participating clients to the servers that send them updates
-        self.dummy_contents = '<<DummyGame contents of DummyGame {:d}>>'.format(self.identifier)
+        
+        self.units = []
 
         self.synchronizer = GameSynchronizer(self.server, self, GAME_SYNC_INTERVAL)
         self.synchronizer.start()
@@ -113,7 +114,8 @@ class DummyGame(object):
         random_field = random.choice(empty_fields)
         random_field.contents = unit
         unit.field = random_field
-        # Add the unit to our dicts
+        # Add the unit to our structures
+        self.units.append(unit)
         if action.player:
             self.players[action.player] = unit
         else:
@@ -153,6 +155,8 @@ class DummyGame(object):
             # Reverse lookup in our player dict: we have the unit, we want the ID
             player = [p_id for p_id, p in self.players.items() if p == unit][0]
             del self.players[player]
+        self.units.remove(unit)
+
 
     # Given an attack-GameAction, attempts to perform an attack
     def attack(self, action):

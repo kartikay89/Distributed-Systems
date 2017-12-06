@@ -5,7 +5,7 @@ import time
 
 from networking import CLIENT_PORT, END_OF_MSG, HEADSERVER_IP, LOCAL, MAX_MSG_SIZE, TIMEOUT, \
                        ClientListener, Message, MessageSender, MessageType, \
-                       await_confirm, await_reply, connect_to_dst, safe_print
+                       await_confirm, await_reply, connect_to_dst, draw, safe_print
 
 
 class Client(threading.Thread):
@@ -48,6 +48,7 @@ class Client(threading.Thread):
             for message in self.messages:
                 if message.type == MessageType.GAME_UPDATE:
                     self.c_print('We got GAME_UPDATE: {:s}'.format(message.contents))
+                    draw(message.contents)
                 elif message.type == MessageType.REDIRECT:
                     self.server_hosts = message.servers
                     self.game_id = message.game_id

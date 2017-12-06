@@ -117,7 +117,8 @@ class GameServer(Server):
             if game:
                 # Check if we are the server that should be sending updates to this client
                 if game.clients_to_update_servers[client] == self.host:
-                    self.send_message(client, Message(type=MessageType.GAME_UPDATE, contents=game.dummy_contents))
+                    self.s_print('Sending update: {:s}'.format(game.units))
+                    self.send_message(client, Message(type=MessageType.GAME_UPDATE, contents=game.units))
 
     def run(self):
         start_time = time.time()
