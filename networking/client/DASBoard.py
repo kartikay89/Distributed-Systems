@@ -1,3 +1,5 @@
+# Based on https://github.com/liudmil-mitev/Simple-Python-Chess
+
 from PIL import Image, ImageTk
 import Tkinter as tk
 
