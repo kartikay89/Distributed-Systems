@@ -6,7 +6,7 @@ from md5 import md5
 # sudo pip install python-levenshtein
 from Levenshtein import distance
 
-from networking import PORT, \
+from networking import PORT, RUN_TIME, \
                        DummyGame, GameAction, GameActionType, Message, MessageType, Server, \
                        safe_print
 
@@ -41,7 +41,6 @@ class GameServer(Server):
         # Store the result.
         # Each server will calculate and store this data separately, thereby reaching consensus as to who is served by whom
         game.clients_to_update_servers[client] = result
-        #self.s_print('We think client {:s} should be served by {:s} for game {:d}'.format(client, result, game.identifier))
 
     # Attempt to join a client to a game
     def game_join(self, message):
@@ -53,14 +52,13 @@ class GameServer(Server):
             game = self.games.get(message.game_id)
         if not game:
             # We don't serve this game
-            #self.s_print('Client {:d} can\'t join game {:d} (we don\'t serve it)'.format(message.client_id, message.game_id))
+            self.s_print('Client {:d} can\'t join game {:s} (we don\'t serve it)'.format(message.client_id, message.game_id))
             return False
         else:
             self.s_print('Client {:d} at {:s} joined game {:d}'.format(message.client_id, message.host, message.game_id))
-            # Perform_action should cancel this action if the player is already in the game
-            game.perform_action(GameAction(type=GameActionType.SPAWN, player=message.host))
             self.clients_to_games[message.host] = message.game_id
             self.determine_update_server(game, message.host)
+            self.send_message(message.host, Message(type=MessageType.GAME_JOINED, host=self.host))
             return True
 
     # Start up a game, given an id and its hosts
@@ -89,7 +87,7 @@ class GameServer(Server):
                 elif message.type == MessageType.GAME_ACTION:
                     # Currently doesn't do much because we only work with dummy games
                     with self.games_lock:
-                        self.games[messages.game_id].perform_action(message)
+                        self.games[message.game_id].perform_action(message.action)
                     continue
                 elif message.type == MessageType.GAME_SYNC:
                     # This is a synchronization message sent by another server, related to a specific game
@@ -129,7 +127,7 @@ class GameServer(Server):
             current_time = time.time()
             self.handle_messages()
             # Stop after 5 seconds
-            if current_time - start_time >= 5:
+            if current_time - start_time >= RUN_TIME:
                 with self.stop_lock:
                     self.stop = True
                 # Wait for our listener and broadcaster threads to quit

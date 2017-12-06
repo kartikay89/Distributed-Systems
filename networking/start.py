@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 import argparse
 
-from networking import GRID_SIZE, \
+from networking import GRID_SIZE, PIXELS_PER_SQUARE, RUN_TIME, \
                        Client, DASBoard, GameServer, HeadServer, Server, \
                        safe_print
 
@@ -34,7 +34,8 @@ if __name__ == '__main__':
 
     servers = []
     clients = []
-    queues = []
+    update_queues = []
+    message_queues = []
     boards = []
     head_server = None
 
@@ -49,24 +50,24 @@ if __name__ == '__main__':
             servers[-1].start()
 
     for i in range(nclients):
-        queues.append(Queue())
-        clients.append(Client(i, queue=queues[-1]))
+        update_queues.append(Queue())
+        message_queues.append(Queue())
+        clients.append(Client(i, 0, RUN_TIME,  update_queue=update_queues[-1], message_queue=message_queues[-1]))
         clients[-1].start()
         if i == 0:
-            board = DASBoard(root, 32, "Superman.png", "Dragon.png", board_size=(GRID_SIZE,GRID_SIZE))
+            board = DASBoard(root, 32, "Superman.png", "Dragon.png", board_size=(GRID_SIZE,GRID_SIZE), message_queue=message_queues[-1])
         else:
             top_level = tk.Toplevel(root)
-            board = DASBoard(top_level, 32, "Superman.png", "Dragon.png", board_size=(GRID_SIZE,GRID_SIZE))
-        board.pack(side="top", fill="both", expand="true", padx=4, pady=4)
+            board = DASBoard(top_level, PIXELS_PER_SQUARE, "Superman.png", "Dragon.png", board_size=(GRID_SIZE,GRID_SIZE), message_queue=message_queues[-1])
+        board.pack(side="top", fill="both", expand=True, padx=4, pady=4)
         boards.append(board)
 
     while True:
         for i in range(len(boards)):
             units = None
-            while not queues[i].empty():
-                units = queues[i].get()
+            while not update_queues[i].empty():
+                units = update_queues[i].get()
             if units:
-                safe_print('Units: {:s}'.format(units))
                 boards[i].update_units(units)
             boards[i].canvas.update_idletasks()
             boards[i].canvas.update()

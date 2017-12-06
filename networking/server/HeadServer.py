@@ -2,7 +2,7 @@ import random
 import threading
 import time
 
-from networking import NSERVERS_PER_GAME, PORT, \
+from networking import NSERVERS_PER_GAME, PORT, RUN_TIME, \
                        DummyGame, HeadServerListener, Message, MessageType, Server, \
                        safe_print
 
@@ -48,6 +48,7 @@ class HeadServer(Server):
     # If so, returns the game_id and the servers hosting it
     # If not, starts a new game and returns corresponding game_id and servers
     def get_gamedata(self, game_id):
+        self.s_print('Detected ID {:d}, dict {:s}'.format(game_id, self.games_to_servers))
         if game_id != None:
             if game_id in self.games_to_servers.keys():
                 return game_id, self.games_to_servers[game_id]
@@ -101,7 +102,7 @@ class HeadServer(Server):
         while True:
             current_time = time.time()
             self.handle_messages()
-            if current_time - start_time >= 5:
+            if current_time - start_time >= RUN_TIME:
                 with self.clients_lock:
                     self.s_print('Clients connected: {:s}'.format(str(self.clients)))
                 with self.stop_lock:

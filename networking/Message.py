@@ -5,7 +5,7 @@ class MessageType(object):
     # GAME_UPDATE: Sent by GameServers to client, telling them to update their GUI
     # GAME_SYNC: Sent by GameServers to each other, to decide on the latest state of a given game
     # GAME_START: Sent by HeadServers to GameServers, instructing them to start a certain game (with properties defined in the Game-object in the message)
-    REDIRECT, GAME_JOIN, GAME_UPDATE, GAME_SYNC, GAME_START, GAME_ACTION = range(6)
+    REDIRECT, GAME_JOIN, GAME_JOINED, GAME_UPDATE, GAME_SYNC, GAME_START, GAME_ACTION = range(7)
 
 
 class Message(object):
