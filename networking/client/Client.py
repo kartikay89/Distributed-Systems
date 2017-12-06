@@ -44,10 +44,7 @@ class Client(threading.Thread):
         safe_print('[CLIENT {:d}]: {:s}'.format(self.identifier, s))
 
     def draw(self, units):
-        if LOCAL:
-            self.draw_queue.put(units)
-        else:
-            pass
+        self.draw_queue.put(units)
 
     # Wrapper function for sending a message to a given host
     def send_message(self, host, message):
@@ -86,8 +83,8 @@ class Client(threading.Thread):
                     if reduce(lambda x,y: x and y, self.servers_confirmed.values()):
                         # All servers have confirmed, we now send a spawn message to all of them
                         self.joined_game = True
-                        spawn_x = random.randint(0, GRID_SIZE - 1)
-                        spawn_y = random.randint(0, GRID_SIZE - 1)
+                        spawn_x = 0 #random.randint(0, GRID_SIZE - 1)
+                        spawn_y = 1+self.identifier #random.randint(0, GRID_SIZE - 1)
                         message = Message(type=MessageType.GAME_ACTION, action=GameAction(type=GameActionType.SPAWN, target_pos=(spawn_x, spawn_y)))
                         for host in self.server_hosts:
                             self.send_message(host, message)

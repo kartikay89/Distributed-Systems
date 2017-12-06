@@ -6,9 +6,9 @@ from md5 import md5
 # sudo pip install python-levenshtein
 from Levenshtein import distance
 
-from networking import PORT, RUN_TIME, \
+from networking import PORT, RUN_TIME, USE_AI_ONLY, \
                        DummyGame, GameAction, GameActionType, Message, MessageType, Server, \
-                       safe_print
+                       get_next_action, safe_print
 
 # This class is used for the worker servers that are used for hosting games
 class GameServer(Server):
@@ -85,6 +85,8 @@ class GameServer(Server):
                     self.start_game(message.game_id, message.servers)
                     continue
                 elif message.type == MessageType.GAME_ACTION:
+                    if USE_AI_ONLY and message.action.type != GameActionType.SPAWN:
+                        continue
                     # Currently doesn't do much because we only work with dummy games
                     with self.games_lock:
                         self.games[message.game_id].perform_action(message.action)
@@ -118,6 +120,14 @@ class GameServer(Server):
                     self.s_print('Sending update: {:s}'.format(game.units))
                     self.send_message(client, Message(type=MessageType.GAME_UPDATE, contents=game.units))
 
+    def do_ai(self):
+        for game in self.games.values():
+            for player in game.players.values():
+                action = get_next_action(player, game)
+                self.s_print('Received action {:s}'.format(action))
+                if action:
+                    game.perform_action(action)
+
     def run(self):
         start_time = time.time()
         print_time = start_time
@@ -126,6 +136,8 @@ class GameServer(Server):
         while True:
             current_time = time.time()
             self.handle_messages()
+            if USE_AI_ONLY:
+                self.do_ai()
             # Stop after 5 seconds
             if current_time - start_time >= RUN_TIME:
                 with self.stop_lock:

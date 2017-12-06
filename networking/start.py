@@ -50,7 +50,7 @@ if __name__ == '__main__':
         clients.append(Client(i, 0, RUN_TIME,  update_queue=update_queues[-1], message_queue=message_queues[-1]))
         clients[-1].start()
         if i == 0:
-            board = DASBoard(root, 32, "Superman.png", "Dragon.png", board_size=(GRID_SIZE,GRID_SIZE), message_queue=message_queues[-1])
+            board = DASBoard(root, PIXELS_PER_SQUARE, "Superman.png", "Dragon.png", board_size=(GRID_SIZE,GRID_SIZE), message_queue=message_queues[-1])
         else:
             top_level = tk.Toplevel(root)
             board = DASBoard(top_level, PIXELS_PER_SQUARE, "Superman.png", "Dragon.png", board_size=(GRID_SIZE,GRID_SIZE), message_queue=message_queues[-1])

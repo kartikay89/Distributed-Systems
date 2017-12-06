@@ -19,6 +19,7 @@ GAME_SYNC_INTERVAL  = 1.0 # Should eventually be made smaller
 GRID_SIZE           = 25
 COOLDOWN			= 1
 PIXELS_PER_SQUARE   = 28
+USE_AI_ONLY 		= True
 
 # When multiple threads are printing at the same time, the newlines are not printed at the same moment as the string
 # This function takes care of this. Alternatively, just call sys.stdout.write(<...>)
@@ -33,6 +34,7 @@ from MessageSender import MessageSender
 from GameAction import GameActionType, GameAction
 from GameSynchronizer import GameSynchronizer
 from DummyGame import DummyGame, Dragon, Player
+from server.ai_functions import get_next_action
 from server.ServerListener import ServerListener
 from server.HeadServerListener import HeadServerListener
 from server.ServerBroadcaster import ServerBroadcaster
