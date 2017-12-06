@@ -19,12 +19,7 @@ def get_args():
     parser.add_argument('-n', '--number_servers', type=int, default=4, help='Number of servers to start')
     parser.add_argument('-c', '--number_clients', type=int, default=4, help='Number of clients to start')
     parser.add_argument('-v', '--verbose', action='store_true', help='Generate verbose output') # Not used yet, but can come in handy later
-    return parser.parse_args()
-
-
-def do_nothing(a):
-    print a
-    return a
+    return parser.parse_args()z
 
 
 if __name__ == '__main__':
